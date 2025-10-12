@@ -69,9 +69,39 @@ void ToDoManager::showLists(){
     cout<< "--------------\n";
 }
 
-void ToDoManager::createList(){
 
+void ToDoManager::createList(){
+//fix the following->>
+        try{
+            string name;
+            cout << "\nEnter the name of the new list: ";  // Ask the user for the new list name
+            getline(cin, name);
+
+            if (name.empty()) {
+            throw invalid_argument( "List name cannot be empty. ");
+            } 
+            
+            if(lists.count(name)) {
+                throw runtime_error("A list with this name already exists.");
+            }
+
+            lists[name] = {};
+            cout<<"List '"<< name << "' created successfully.\n";
+    }
+    
+    catch(const invalid_argument& e){
+        cout<< "Input error: " << e.what() << "\n";
+
+    }
+    catch(const runtime_error& e){
+        cout<<"Creation error: " << e.what() << "\n";
+    }
+    
+    catch(...) {
+        cout<<"Unexpected error occurred while creating the list.\n";
+    }
 }
+
 void ToDoManager::addTask(){
 
 }
