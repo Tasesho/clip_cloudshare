@@ -10,7 +10,7 @@ using namespace std;
 void ToDoManager::manageMenu() {
     int option = 0;
 
-    // This function implements a do-while loop that controls the ToDo menu.
+    // implements a do-while loop that controls the ToDo menu.
     // It displays an interface using 'cout' where the user selects options
     // by entering a number that corresponds to a menu action.
     do {
@@ -71,10 +71,10 @@ void ToDoManager::showLists(){
 
 
 void ToDoManager::createList(){
-//fix the following->>
+        //in the 'try' code block we'll be trying to create a new list, if fails it will throw an error.
         try{
             string name;
-            cout << "\nEnter the name of the new list: ";  // Ask the user for the new list name
+            cout << "\nEnter the name of the new list: ";
             getline(cin, name);
 
             if (name.empty()) {
@@ -103,11 +103,123 @@ void ToDoManager::createList(){
 }
 
 void ToDoManager::addTask(){
+        string task;
+        string listName;
 
+        cout<<"Add a new Task\n";
+        cout<<"Enter the name of the list: \n";
+
+        getline(cin, listName);
+
+        //check if list exist
+
+        if(!lists.count(listName)) {
+            cout<< "List '" << listName <<"' not found\n";
+        return;
+        }   
+    
+    
+        cout << "Enter task description: \n";
+        getline(cin, task);
+
+        if(task.empty()){ 
+            cout<< "Task cannot be empty. \n";
+            return;
+        }
+
+
+        //push the task in the vector, by default as false-> not completed.
+        lists[listName].push_back({task,false}); 
+        cout<< "Task added succesfully to list '" <<listName <<"'. \n";
 }
+
+
 void ToDoManager::markTask(){
+    
+    string listName;
+    cout<<"Enter the name of the List: \n";
+    getline(cin, listName);
+
+    if(!lists.count(listName)) {
+            cout<< "List '" << listName <<"' not found\n";
+            return;
+        }  
+
+
+        //access to vector of task. Declared const to prevent modification and esure safe iteration
+        const auto& task = lists[listName];  
+
+
+        if(task.empty()){
+        cout<< "No task found in this list.\n";
+        return;
+    }
+
+    /*display tasks with their completion status.
+    Uses size_t because it's unsigned and matches task.size(), making it
+    ideal for loop indexing*/
+
+    for(size_t i=0; i<task.size(); i++){
+        cout<< i <<". "
+        <<(task[i].second ? "[X] " : "[ ] ")
+        <<task[i].first << "\n";
+    }
+
+    //uses indexation to search for each task. 
+    //Ex: select task: 2.
+    //searches for the task in index 2(starts by 0) so:
+    //vector task = {task1, task2,task3, task4}
+    //in this case index 2= "task3".
+    
+    cout<< "Enter the index of the task to mark as completed: ";
+    int index;
+    cin>>index;
+    cin.ignore();
+    
+    //validate that the selected index is withing the valid range.
+    //static_cast<int> avoid signed/unsigned comparison issues.
+    if(index < 0 or index >=static_cast<int>(task.size())) {
+        cout<<"Invalid index.\n";
+        return;
+    }
+
+    //mark as completed
+    lists[listName][index].second =true;
+
+    //display the task name that just was marked
+    cout<< "Task '" << lists[listName][index].first <<"' marked as completed.\n";
 
 }
 void ToDoManager::deleteTask(){
+        string task;
+        string listName;
+
+        cout<<"Delete a task\n";
+        cout<<"Enter the name of the list: \n";
+
+        getline(cin, listName);
+
+        //check if list exist
+
+        if(!lists.count(listName)) {
+            cout<< "List '" << listName <<"' not found\n";
+        return;
+        }   
+
+        if(task.empty()){ 
+            cout<< "Task cannot be empty. \n";
+            return;
+        }
+
+
+        //push the task in the vector, by default as false-> not completed.
+        lists[listName].pop_back(); 
+        cout<< "Task added succesfully to list '" <<listName <<"'. \n";
 
 }
+
+
+/* THE USE OF 'try, throw and catch' its used following this rules:
+
+-for input validation: if n else
+-for logic or system-level failures: try n catch*/
