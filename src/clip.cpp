@@ -1,5 +1,4 @@
-/*este archivo solo tiene las definiciones de los metodos de la clase Clip, 
-aplica herencia de metodos y luego los define*/
+/*this file only contains methods definitions of Clip class. Use methods inheritance.*/
 
 #include "../include/clip.hpp"
 #include <iostream>

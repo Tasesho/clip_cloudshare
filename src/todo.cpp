@@ -150,7 +150,7 @@ void ToDoManager::markTask(){
         const auto& task = lists[listName];  
 
 
-        if(task.empty()){
+    if(task.empty()){
         cout<< "No task found in this list.\n";
         return;
     }
