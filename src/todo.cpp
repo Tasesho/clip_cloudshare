@@ -1,5 +1,7 @@
 #include "../include/todo.hpp"
 #include <iostream>
+#include <string>
+
 
 
 using namespace std;
@@ -17,10 +19,8 @@ void ToDoManager::manageMenu() {
         cout << "\n========= TO DO MENU =========\n";
         cout << "1. Show all lists\n";
         cout << "2. Create a new list\n";
-        cout << "3. Add a task to a list\n";
-        cout << "4. Mark a task as completed\n";
-        cout << "5. Delete a task from a list\n";
-        cout << "6. Return to Clip\n";
+        cout << "3. View/Manage lists\n";
+        cout << "4. Return to Clip\n";
         cout << "==============================\n";
         cout << "Choose an option: ";
 
@@ -40,14 +40,12 @@ void ToDoManager::manageMenu() {
         switch (option) {
             case 1: showLists(); break;
             case 2: createList(); break;
-            case 3: addTask(); break;
-            case 4: markTask(); break;
-            case 5: deleteTask(); break;
-            case 6: cout << "Returning to Clip...\n"; break;
+            case 3: manageListMenu(); break;
+            case 4: cout << "Returning to Clip...\n"; break;
             default: cout << "Invalid option. Try again.\n"; break;
         }
 
-    } while (option != 6); // The loop continues until the user chooses 6.
+    } while (option != 4); // The loop continues until the user chooses 6.
 }
 
 //---------------------------------------------------------------------------------
@@ -85,7 +83,7 @@ void ToDoManager::createList(){
                 throw runtime_error("A list with this name already exists.");
             }
 
-            lists[name] = {};
+            lists.emplace(name, TaskList());
             cout<<"List '"<< name << "' created successfully.\n";
     }
     
@@ -102,121 +100,118 @@ void ToDoManager::createList(){
     }
 }
 
-void ToDoManager::addTask(){
-        string task;
-        string listName;
 
-        cout<<"Add a new Task\n";
-        cout<<"Enter the name of the list: \n";
-
-        getline(cin, listName);
-
-        //check if list exist
-
-        if(!lists.count(listName)) {
-            cout<< "List '" << listName <<"' not found\n";
-        return;
-        }   
-    
-    
-        cout << "Enter task description: \n";
-        getline(cin, task);
-
-        if(task.empty()){ 
-            cout<< "Task cannot be empty. \n";
-            return;
-        }
-
-
-        //push the task in the vector, by default as false-> not completed.
-        lists[listName].push_back({task,false}); 
-        cout<< "Task added succesfully to list '" <<listName <<"'. \n";
-}
-
-
-void ToDoManager::markTask(){
-    
+void ToDoManager::manageListMenu(){
     string listName;
-    cout<<"Enter the name of the List: \n";
-    getline(cin, listName);
+    cout<<"\nEnter the name of the list to manage: ";
+    getline (cin, listName);
 
-    if(!lists.count(listName)) {
-            cout<< "List '" << listName <<"' not found\n";
-            return;
-        }  
-
-
-        //access to vector of task. Declared const to prevent modification and esure safe iteration
-        const auto& task = lists[listName];  
-
-
-    if(task.empty()){
-        cout<< "No task found in this list.\n";
+    if(lists.count(listName)==0){
+        cout << "Error: List '" << listName << "' not found.\n";
         return;
     }
 
-    /*display tasks with their completion status.
-    Uses size_t because it's unsigned and matches task.size(), making it
-    ideal for loop indexing*/
+    TaskList& list = lists.at(listName);
 
-    for(size_t i=0; i<task.size(); i++){
-        cout<< i <<". "
-        <<(task[i].second ? "[X] " : "[ ] ")
-        <<task[i].first << "\n";
+    const vector<Task>& taskToDisplay = list.getTasks();
+
+    cout<<" \n --- Tasks in '" <<listName <<"' ---\n";
+    if(taskToDisplay.empty()){
+        cout<< "This list has no task yet.\n";
     }
-
-    //uses indexation to search for each task. 
-    //Ex: select task: 2.
-    //searches for the task in index 2(starts by 0) so:
-    //vector task = {task1, task2,task3, task4}
-    //in this case index 2= "task3".
-    
-    cout<< "Enter the index of the task to mark as completed: ";
-    int index;
-    cin>>index;
-    cin.ignore();
-    
-    //validate that the selected index is withing the valid range.
-    //static_cast<int> avoid signed/unsigned comparison issues.
-    if(index < 0 or index >=static_cast<int>(task.size())) {
-        cout<<"Invalid index.\n";
-        return;
-    }
-
-    //mark as completed
-    lists[listName][index].second =true;
-
-    //display the task name that just was marked
-    cout<< "Task '" << lists[listName][index].first <<"' marked as completed.\n";
-
-}
-void ToDoManager::deleteTask(){
-        string task;
-        string listName;
-
-        cout<<"Delete a task\n";
-        cout<<"Enter the name of the list: \n";
-
-        getline(cin, listName);
-
-        //check if list exist
-
-        if(!lists.count(listName)) {
-            cout<< "List '" << listName <<"' not found\n";
-        return;
-        }   
-
-        if(task.empty()){ 
-            cout<< "Task cannot be empty. \n";
-            return;
+    else{
+        for(size_t i =0; i<taskToDisplay.size(); i++){
+            cout<< i << ". "
+            <<(taskToDisplay[i].isComplete() ? "[X] " : "[ ] ")
+            <<taskToDisplay[i].getdescription() << "\n";
         }
+    }
 
+    cout <<"-----------------------------\n";
 
-        //push the task in the vector, by default as false-> not completed.
-        lists[listName].pop_back(); 
-        cout<< "Task added succesfully to list '" <<listName <<"'. \n";
+    cout<<" Manage Tasks: \n";
+    cout<<" 1. Add a new task\n";
+    cout<<" 2. Mark/Unmark a task\n";
+    cout<<" 3. Delete a task\n";
+    cout<<" 4. Go back to main menu\n";
+    cout<<" choose an option: \n";
 
-}
+    int choice;
+    if(!(cin>> choice)) {
+        cin.clear();
+        cin.ignore(10000, '\n');
+        cout<<"Invalid input.\n";
+        return;
+    }
+    cin.ignore();
+
+    switch(choice){
+        case 1: {
+            cout<<"Enter the new task description: ";
+            string desc;
+            getline(cin, desc);
+            if(!desc.empty()){
+                list.addTask(desc);
+                cout<<"Task added!\n";
+            }
+            else{
+                cout<<"Task description cannot be empty. \n";
+            } break;
+        }
+        case 2: {
+            if(taskToDisplay.empty()) {
+                cout<<" No tasks to mark. /n";
+                break;
+            }
+            else{
+                cout<<"Enter the number of the task to Mark/unmark: ";
+                size_t index;
+                cin>>index;
+                cin.ignore();
+                if(index < taskToDisplay.size()) {
+                    Task& taskToMark = list.getTask(index);
+                    if(taskToMark.isComplete()){
+                        taskToMark.markIncomplete();
+                        cout<<"Task marked as INCOMPLETE.\n";
+                    }
+                    else{
+                        taskToMark.markCompleted();
+                        cout<<"Task marked as COMPLETE. \n";
+                    }
+                }
+                else{
+                    cout<<" Invalid task number. \n";
+                }
+                break;
+            }
+        }
+            case 3: {
+                if(taskToDisplay.empty()){
+                    cout<< "No task to delete.\n";
+                    break;
+                }
+                cout<<"Enter the number of the task to delete: ";
+                size_t index;
+                cin>>index;
+                cin.ignore();
+                if(index< taskToDisplay.size()) {
+                    string desc = list.getTask(index).getdescription();
+                    list.deleteTask(index);
+                    cout<<" Task '"<<desc<<"' deleted.\n";
+                }
+                else {
+                    cout<< "Invalid task number.\n";
+                }
+                break;
+            }
+            case 4: {
+                break;
+            }
+                default:
+                cout<<"Invalid option.\n";
+                break;
+            }
+        }  
 
 
 /* THE USE OF 'try, throw and catch' its used following this rules:

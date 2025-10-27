@@ -1,6 +1,7 @@
 #ifndef TODO_HPP
 #define TODO_HPP
 
+#include "../include/tasklist.hpp"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -16,16 +17,15 @@ class ToDoManager{
 //        - second: completion status (true = done, false = not done)
 
     private:
-        map<string, vector<pair<string, bool>>> lists;  
+        map<string, TaskList> lists;  
+        void manageListMenu();  //secondary menu for list management
 
     public:
     
         void manageMenu();     // main menu for todolist
         void showLists();       //show all existing lists
         void createList();      //create a new list
-        void addTask();         //add a new task to an existing list
-        void markTask();        //mark a task as completed or not completed
-        void deleteTask();      // delete a task from a list
 
+        
 };
 #endif
