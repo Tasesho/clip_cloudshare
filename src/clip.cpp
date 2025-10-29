@@ -32,7 +32,8 @@ Clip::Clip(){
         {"clear", "Clean the current CMD tab\n"},
         {"exit", "Closes Clip\n"},
         {"run", "Run an adress in your computer: C: direccion_of_file\n"},
-        {"convertfile", "Converts a docx file into pdf (COMING SOON)\n"}
+        {"convertfile", "Converts a docx file into pdf (COMING SOON)\n"},
+        {"todo", "Enters ToDoManager"}
     };
 
 
