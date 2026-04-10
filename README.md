@@ -40,3 +40,8 @@ The User can Interact with the Command Prompt. Following the next commands:
 
 ## Disclaimer
 This project has been developed exclusively with educational pourposes. It is an Open-source project, so feel free to use it as you wish.
+
+
+# IMPORTANT
+
+THIS PROJECT WAS MOVED TO https://github.com/Tasesho/CLIp
